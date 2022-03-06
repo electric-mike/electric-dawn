@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="{{ 'component-card.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-product-grid.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'section-product-recommendations.css' | asset_url }}" media="print" onload="this.media='all'">
+
+<noscript>{{ 'component-card.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-price.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-product-grid.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'section-product-recommendations.css' | asset_url | stylesheet_tag }}</noscript>
+
+<recently-viewed class="product-recommendations page-width">
+  <h2 class="product-recommendations__heading">{{ section.settings.heading | escape }}</h2>
+  <ul id="recently-viewed-products-wrapper" class="grid grid--2-col product-grid grid--4-col-desktop grid--quarter-max" role="list">
+  </ul>
+</recently-viewed>
+
+{% javascript %}
+  class RecentlyViewed extends HTMLElement {
+    constructor() {
+      super();
+
+      this.generateMarkup()
+    }
+
+    async generateMarkup() {
+      if(window.location.pathname.includes('/products/')) {
+        this.currentProductHandle = window.location.pathname.split('/products/')[1].split('/')[0]
+        this.recentlyViewedHandles = Array.from(
+          window.localStorage.getItem('recently-viewed') ? 
+            window.localStorage.getItem('recently-viewed').split(',')
+            : false
+        )
+        this.productsWrapper = document.getElementById('recently-viewed-products-wrapper')
+        this.recentlyViewedMarkup = ''
+        this.recentlyViewedMarkupHandles = []
+  
+        for(let i = 0; i < this.recentlyViewedHandles.length; i += 1) {
+          if(
+            this.recentlyViewedMarkupHandles.length < 4
+            && this.recentlyViewedMarkupHandles.indexOf(this.recentlyViewedHandles[i]) <= -1
+            && this.currentProductHandle != this.recentlyViewedHandles[i]
+          ) {
+            await fetch(`${this.recentlyViewedHandles[i]}/?view=product-card`)
+              .then(res => res.text())
+              .then(res => {
+                this.recentlyViewedMarkupHandles.push(this.recentlyViewedHandles[i])
+                this.recentlyViewedMarkup += `<li class="grid__item">${res}</li>`
+              })
+          }
+        }
+
+        this.recentlyViewedHandles.unshift(this.currentProductHandle)
+
+        if(this.recentlyViewedMarkup != '') {
+          this.productsWrapper.innerHTML = this.recentlyViewedMarkup
+        } else {
+          document.querySelector('recently-viewed').style.display = 'none'
+        }
+
+        window.localStorage.setItem('recently-viewed', this.recentlyViewedHandles)
+      }
+    }
+  }
+
+  customElements.define('recently-viewed', RecentlyViewed);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Recently Viewed",
+  "tag": "section",
+  "class": "spaced-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Recently viewed",
+      "label": "t:sections.product-recommendations.settings.heading.label"
+    }
+  ]
+}
+{% endschema %}

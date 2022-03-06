@@ -1,0 +1,68 @@
+{% if section.settings.enable_flex_cart_layout %}
+<style>
+  @media(min-width: 990px) {
+    #MainContent {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: var(--page-width);
+      margin: 0 auto;
+    }
+  
+    #MainContent .shopify-section[id*="__cart-items"] {
+      flex-basis: calc({{ section.settings.cart_width }}% - 5em);
+      width: calc({{ section.settings.cart_width }}% - 5em);
+      flex-grow: 1;
+    }
+
+    #MainContent .shopify-section[id*="__cart-items"] cart-items {
+      padding-right: 0;
+    }
+  
+    #MainContent .shopify-section[id*="__cart-footer"] {
+      flex-basis: calc({{ section.settings.subtotal_checkout_width }}% - 5em);
+      width: calc({{ section.settings.subtotal_checkout_width }}% - 5em);
+      flex-grow: 1;
+    }
+  
+    #MainContent > section {
+      width: 100%;
+    }
+  }
+</style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Cart Customize",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_flex_cart_layout",
+      "default": true,
+      "label": "Enable Flex Cart Layout"
+    },
+    {
+      "type": "range",
+      "id": "cart_width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Cart Width",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "subtotal_checkout_width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Subtotal/Checkout Width",
+      "default": 100
+    }
+  ],
+  "templates": ["cart"]
+}
+{% endschema %}

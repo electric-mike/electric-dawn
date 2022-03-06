@@ -1,0 +1,40 @@
+free-shipping-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  max-width: 24em;
+  margin: 0 auto 1em;
+  flex-direction: column;
+}
+
+#free-shipping-bar-progress {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  width: 100%;
+  border: 1px solid rgba(var(--color-button), var(--alpha-button-background));
+  /* For IE10 */
+  color: rgba(var(--color-button), var(--alpha-button-background));
+}
+
+.free-shipping-bar-label {
+  margin: 0 0 0 auto;
+}
+
+.free-shipping-bar-label strong {
+  display: inline;
+  color: rgba(var(--color-button), var(--alpha-button-background));
+}
+
+#free-shipping-bar-progress::-webkit-progress-bar {
+  background-color: rgb(var(--color-button-text));
+}
+
+#free-shipping-bar-progress::-webkit-progress-value {
+  background-color: rgba(var(--color-button), var(--alpha-button-background));
+}
+#free-shipping-bar-progress::-moz-progress-bar {
+  background-color: rgba(var(--color-button), var(--alpha-button-background));
+}
