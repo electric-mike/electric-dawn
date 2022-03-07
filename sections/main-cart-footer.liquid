@@ -2,6 +2,7 @@
 {{ 'component-totals.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+{{ 'component-free-shipping.bar.css' | asset_url | stylesheet_tag }}
 
 <div class="page-width{% if cart == empty %} is-empty{% endif %}" id="main-cart-footer" data-id="{{ section.id }}">
   <div>
@@ -29,8 +30,8 @@
                   {%- if cart.cart_level_discount_applications.size > 0 -%}
                     <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
                       {%- for discount in cart.cart_level_discount_applications -%}
-                        <li class="discounts__discount discounts__discount--position">
-                          {%- render 'icon-discount' -%}
+                      <li class="discounts__discount discounts__discount--position">
+                        {%- render 'icon-discount' -%}
                           {{ discount.title }}
                           (-{{ discount.total_allocated_amount | money }})
                         </li>
@@ -50,6 +51,19 @@
                     {{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
                   {%- endif -%}
                 </small>
+              </div>
+            {%- when 'free-shipping-bar' -%}
+              <div {{ block.shopify_attributes }}>
+                {% assign free_shipping_minimum = section.settings.free_shipping_threshold | times: 100 %}
+                {% assign cart_total = cart.items_subtotal_price %}
+                <free-shipping-bar>
+                  {% if cart_total >= free_shipping_minimum %}
+                  <small class="free-shipping-bar-label">You qualify for free shipping!</small>
+                  {% else %}
+                  <small class="free-shipping-bar-label">You are <strong>{{ free_shipping_minimum | minus: cart_total | money}}</strong> away from free shipping</small>
+                  {% endif %}
+                  <progress id="free-shipping-bar-progress" value="{{ cart_total }}" max="{{ free_shipping_minimum }}"> 32% </progress>
+                </free-shipping-bar>
               </div>
             {%- else -%}
               <div class="cart__ctas" {{ block.shopify_attributes }}>
@@ -124,9 +138,24 @@
       "id": "show_cart_note",
       "default": false,
       "label": "t:sections.main-cart-footer.settings.show_cart_note.label"
+    },
+    {
+      "type": "range",
+      "id": "free_shipping_threshold",
+      "label": "Free Shipping Threshold",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
     }
   ],
   "blocks": [
+    {
+      "type": "free-shipping-bar",
+      "name": "Free Shipping Bar",
+      "limit": 1
+    },
     {
       "type": "subtotal",
       "name": "t:sections.main-cart-footer.blocks.subtotal.name",
